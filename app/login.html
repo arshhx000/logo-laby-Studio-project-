@@ -3,180 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
+    <title>Logo Laby Studio - Brand Engineering</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f0f4f8 url('https://www.transparenttextures.com/patterns/cubes.png');
+        :root {
+            --bg-color: #F2F2F2;
+            --ink-color: #111111;
+            --accent-color: #FF3300; /* Safety Orange */
+            --grid-line: #d4d4d4;
         }
-        /* Animation for elements fading in on load */
-        @keyframes enter-animation {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .animate-enter {
-            animation: enter-animation 0.6s ease-out forwards;
-        }
-        /* Staggered animation delay */
-        .delay-150 { animation-delay: 150ms; }
-        .delay-300 { animation-delay: 300ms; }
 
-        /* Make sure initial state is invisible for animation */
-        .animate-enter {
-            opacity: 0;
+        body {
+            background-color: var(--bg-color);
+            color: var(--ink-color);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .font-mono {
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* --- Grid System --- */
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+        .grid-line {
+            width: 1px;
+            height: 100%;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* --- Border Utilities --- */
+        .border-black { border-color: var(--ink-color); }
+        .border-t-black { border-top: 1px solid var(--ink-color); }
+        .border-b-black { border-bottom: 1px solid var(--ink-color); }
+        .border-l-black { border-left: 1px solid var(--ink-color); }
+        .border-r-black { border-right: 1px solid var(--ink-color); }
+
+        /* --- Typography --- */
+        .display-text {
+            line-height: 0.9;
+            letter-spacing: -0.03em;
+        }
+        
+        /* --- Hover Image Reveal --- */
+        .project-card img {
+            filter: grayscale(100%);
+            transition: filter 0.4s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .project-card:hover img {
+            filter: grayscale(0%);
+            transform: scale(1.05);
+        }
+
+        /* --- Marquee --- */
+        .marquee-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 15s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- WhatsApp Float --- */
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 50;
+            background: var(--ink-color);
+            color: white;
+            border: 1px solid var(--ink-color);
+            transition: all 0.3s ease;
+            box-shadow: 5px 5px 0px var(--accent-color);
+        }
+        .whatsapp-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0px var(--accent-color);
+        }
+
+        /* --- Selection --- */
+        ::selection {
+            background: var(--accent-color);
+            color: white;
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="relative">
 
-    <!-- Main Content -->
-    <div id="main-content" class="flex flex-col min-h-screen">
-        <!-- Header Section -->
-        <header class="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-20">
-            <nav class="container mx-auto px-6 py-4 flex justify-between items-center h-16">
-                 
-            </nav>
-        </header>
-
-        <!-- Main Dashboard -->
-        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8 flex items-center">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-                
-                <!-- Left Column -->
-                <div class="lg:col-span-1 flex items-center justify-center animate-enter delay-150">
-                    <!-- Quote Slider -->
-                    <div class="relative bg-white/70 backdrop-blur-sm border border-white/30 p-6 rounded-2xl shadow-lg text-center w-full">
-                        <span id="view-count" class="absolute top-3 left-3 bg-[#f4811f] text-white text-xs font-semibold px-2 py-1 rounded-full shadow"></span>
-                        <p id="quote-text" class="text-lg md:text-xl text-gray-800 min-h-[120px] flex items-center justify-center px-8 transition-opacity duration-300"></p>
-                        <div class="absolute inset-y-0 left-2 flex items-center">
-                            <button id="prev-btn" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                            </button>
-                        </div>
-                        <div class="absolute inset-y-0 right-2 flex items-center">
-                             <button id="next-btn" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none transition-colors">
-                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="lg:col-span-1 animate-enter delay-300">
-                     <div class="bg-white/70 backdrop-blur-sm border border-white/30 p-6 rounded-2xl shadow-lg">
-                        <div class="flex justify-around items-center gap-6">
-                            <a href="class.html" class="w-40 h-40 flex flex-col items-center justify-center space-y-3 p-4 bg-white/50 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-transparent hover:border-blue-200">
-                                <div class="text-blue-500">
-                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                </div>
-                                <p class="font-bold text-gray-800 text-lg">Class</p>
-                            </a>
-                            <a href="contact.html" class="w-40 h-40 flex flex-col items-center justify-center space-y-3 p-4 bg-white/50 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-transparent hover:border-orange-200">
-                                <div class="text-orange-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2 2 4-4" />
-                                    </svg>
-                                </div>
-                                <p class="font-bold text-gray-800 text-lg">Fard</p>
-                            </a>
-                        </div>
-                     </div>
-                </div>
-            </div>
-        </main>
+    <!-- Vertical Grid Background -->
+    <div class="grid-overlay hidden md:flex">
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
     </div>
 
-    <script>
-        // --- Quote Slider Script ---
-        const quotes = [
-            "Do not go near adultery; it is truly a shameful deed and an evil way. (17:32)",
-            "Allah loves to see one’s job done with itqan (meticulous excellence).",
-            "When one task is finished, immediately “strive on” into the next, reducing procrastination by keeping momentum. (94:7–8)",
-            "Aim for itqan: set a clear definition of “done well,” review work, and refine, seeking the love of Allah for excellent effort.",
-            "Actions are only by intentions, and each person will have only what he intended…",
-            "Allah does not look at your appearance or wealth, but He looks at your hearts and your deeds.",
-            "Surely, with hardship comes ease; surely, with that hardship comes more ease.",
-            "When finished with one duty, strive on; and to the Lord turn with longing.",
-            "Do not despair; return to Allah with repentance and hope, trusting His promise of forgiveness and relief.",
-            "Aim for إتقان (itqān)—doing work with excellence—as a Prophetic ethic that turns effort into worship.",
-            "Say: Work, for Allah will see your deeds” (9:105), which turns daily work into accountable worship and fuels consistent quality.",
-            "And when your Lord proclaimed: If you are grateful, I will surely increase you.",
-            "We are what we repeatedly do. Excellence, then, is not an act, but a habit. — Aristotle",
-            "The secret of getting ahead is getting started. — Mark Twain",
-            "You do not rise to the level of your goals. You fall to the level of your systems. — James Clear",
-            "Amateurs sit and wait for inspiration, the rest of us just get up and go to work. — Stephen King",
-            "Well done is better than well said. — Benjamin Franklin",
-            "You have a right to perform your prescribed duties, but you are not entitled to the fruits of your actions. — The Bhagavad Gita",
-            "Arise, awake, and stop not till the goal is reached. — Swami Vivekananda",
-            "The mind is everything. What you think you become. — Gautama Buddha",
-            "A man is great by deeds, not by birth. — Chanakya",
-            "To make a deep mental path, we must think over and over the kind of thoughts we wish to dominate our lives. — Henry David Thoreau",
-            "The chains of habit are too weak to be felt until they are too strong to be broken. — Samuel Johnson",
-            "The first principle is that you must not fool yourself – and you are the easiest person to fool. — Richard Feynman",
-            "Success is not final, failure is not fatal: it is the courage to continue that counts. — Winston Churchill"
-        ];
-
-        let currentQuoteIndex = -1; // Use -1 to ensure the first quote is always new
-        const quoteTextElement = document.getElementById('quote-text');
-        const viewCountElement = document.getElementById('view-count');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-
-        const getViewCounts = () => JSON.parse(localStorage.getItem('quoteViewCounts')) || new Array(quotes.length).fill(0);
-        const saveViewCounts = (counts) => localStorage.setItem('quoteViewCounts', JSON.stringify(counts));
-
-        const showQuote = (index) => {
-            // Fade out the text
-            quoteTextElement.classList.add('opacity-0');
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 bg-[#F2F2F2] border-b-black">
+        <div class="flex justify-between items-stretch h-16">
+            <!-- Logo Area -->
+            <a href="#" class="flex items-center gap-3 px-6 md:px-10 text-xl font-bold uppercase tracking-tighter border-r-black bg-white hover:bg-[#FF3300] hover:text-white transition-colors group">
+                <img src="https://placehold.co/40x40/000000/FFFFFF/png?text=L" alt="Logo" class="w-8 h-8 border border-current object-cover">
+                <span>Logo Laby<span class="hidden md:inline">&nbsp;Studio</span></span>
+            </a>
             
-            setTimeout(() => {
-                // Update the content after fade out
-                quoteTextElement.textContent = quotes[index];
-                const counts = getViewCounts();
-                counts[index]++;
-                saveViewCounts(counts);
-                viewCountElement.textContent = counts[index];
-                
-                // Fade the text back in
-                quoteTextElement.classList.remove('opacity-0');
-            }, 300); // Duration should match the CSS transition
-        };
+            <!-- Marquee in Nav -->
+            <div class="hidden md:flex flex-1 items-center overflow-hidden border-r-black bg-[#F2F2F2]">
+                <div class="marquee-wrap w-full">
+                    <div class="marquee-content font-mono text-xs uppercase tracking-widest">
+                        • Brand Strategy • Visual Identity • Logo Design • Art Direction • Packaging • Digital Design • Brand Strategy • Visual Identity • Logo Design • Art Direction • Packaging • Digital Design 
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu Links -->
+            <div class="flex items-stretch">
+                <a href="#work" class="hidden md:flex items-center px-8 text-sm font-bold uppercase border-r-black hover:bg-black hover:text-white transition-colors">Work</a>
+                <a href="#services" class="hidden md:flex items-center px-8 text-sm font-bold uppercase border-r-black hover:bg-black hover:text-white transition-colors">Services</a>
+                <a href="#contact" class="flex items-center px-8 bg-[#FF3300] text-white text-sm font-bold uppercase hover:bg-black transition-colors">
+                    Start Project
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-16 min-h-screen flex flex-col">
+        <div class="flex-1 flex flex-col justify-center px-4 md:px-10 py-20">
+            
+            <!-- Top Tag -->
+            <div class="mb-12 flex items-center gap-4">
+                <span class="w-3 h-3 bg-[#FF3300]"></span>
+                <span class="font-mono text-xs md:text-sm uppercase tracking-widest text-gray-500">Est. 2020 — Brand Engineering</span>
+            </div>
+
+            <!-- Main Headline -->
+            <div class="space-y-2 md:space-y-6">
+                <h1 class="display-text text-5xl md:text-7xl lg:text-[7rem] font-bold uppercase">
+                    Helping Businesses
+                </h1>
+                <div class="flex flex-col md:flex-row md:items-end gap-4 md:gap-8">
+                    <h1 class="display-text text-5xl md:text-7xl lg:text-[7rem] font-bold uppercase">
+                        Become <span class="text-[#FF3300] italic">Brands</span>
+                    </h1>
+                    <p class="font-mono text-sm md:text-base max-w-md mb-3 md:mb-5 leading-relaxed">
+                        // We don't do cheap decorations.<br>
+                        // We build structural identities that<br>
+                        // withstand the test of time.
+                    </p>
+                </div>
+                <h1 class="display-text text-5xl md:text-7xl lg:text-[7rem] font-bold uppercase">
+                    That Matter.
+                </h1>
+            </div>
+
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="border-t-black flex flex-col md:flex-row">
+            <div class="flex-1 p-8 border-b-black md:border-b-0 md:border-r-black bg-white">
+                <span class="block font-mono text-xs text-gray-400 mb-2">01 / EXPERIENCE</span>
+                <span class="text-3xl font-bold">4+ Years</span>
+            </div>
+            <div class="flex-1 p-8 border-b-black md:border-b-0 md:border-r-black bg-white">
+                <span class="block font-mono text-xs text-gray-400 mb-2">02 / OUTPUT</span>
+                <span class="text-3xl font-bold">100+ Logos</span>
+            </div>
+            <div class="flex-1 p-8 bg-black text-white flex items-center justify-between group cursor-pointer hover:bg-[#FF3300] transition-colors">
+                <span class="text-xl font-bold uppercase">View Portfolio</span>
+                <svg class="w-6 h-6 transform group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Services (Grid Layout) -->
+    <section id="services" class="border-b-black">
+        <div class="grid md:grid-cols-12">
+            <!-- Sidebar Title -->
+            <div class="md:col-span-3 p-8 md:p-12 border-b-black md:border-b-0 md:border-r-black bg-[#F9F9F9]">
+                <h2 class="text-sm font-mono uppercase tracking-widest mb-4 text-gray-500">Our Services</h2>
+                <p class="text-2xl font-bold leading-tight">
+                    Precise execution at an affordable price point.
+                </p>
+            </div>
+            
+            <!-- Content -->
+            <div class="md:col-span-9 grid md:grid-cols-2">
+                <!-- Item 1 -->
+                <div class="p-10 md:p-16 border-b-black md:border-b-0 md:border-r-black hover:bg-white transition-colors group">
+                    <div class="w-12 h-12 border border-black flex items-center justify-center mb-8 bg-white shadow-[4px_4px_0px_#000] group-hover:shadow-[4px_4px_0px_#FF3300] transition-shadow">
+                        <span class="font-mono font-bold">01</span>
+                    </div>
+                    <h3 class="text-2xl font-bold uppercase mb-4">Visual Identity</h3>
+                    <p class="font-mono text-sm text-gray-600 leading-relaxed">
+                        Creating the distinct visual language of your business. Logos, typography systems, and color palettes designed for clarity.
+                    </p>
+                </div>
+                <!-- Item 2 -->
+                <div class="p-10 md:p-16 hover:bg-white transition-colors group">
+                    <div class="w-12 h-12 border border-black flex items-center justify-center mb-8 bg-white shadow-[4px_4px_0px_#000] group-hover:shadow-[4px_4px_0px_#FF3300] transition-shadow">
+                        <span class="font-mono font-bold">02</span>
+                    </div>
+                    <h3 class="text-2xl font-bold uppercase mb-4">Brand Strategy</h3>
+                    <p class="font-mono text-sm text-gray-600 leading-relaxed">
+                        Defining the 'why' before the 'how'. We structure your market positioning to ensure relevance and longevity.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio (Masonry-ish) -->
+    <section id="work" class="bg-white">
+        <div class="p-6 md:p-10 border-b-black flex justify-between items-end">
+            <h2 class="display-text text-5xl md:text-6xl font-bold uppercase">Selected Work</h2>
+            <span class="font-mono text-xs uppercase tracking-widest">Index 001 — 100</span>
+        </div>
+
+        <div class="grid md:grid-cols-3 border-b-black">
+            <!-- Project 1 -->
+            <a href="#" class="project-card group border-b-black md:border-b-0 md:border-r-black block relative overflow-hidden aspect-[4/5]">
+                <img src="https://placehold.co/800x1000/e5e5e5/333?text=Apex+Dynamics" class="absolute inset-0 w-full h-full object-cover" alt="Project 1">
+                <div class="absolute bottom-0 left-0 w-full p-6 bg-white border-t-black translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <h4 class="text-xl font-bold uppercase">Apex Dynamics</h4>
+                    <p class="font-mono text-xs text-gray-500 mt-1">Identity System</p>
+                </div>
+            </a>
+
+            <!-- Project 2 -->
+            <a href="#" class="project-card group border-b-black md:border-b-0 md:border-r-black block relative overflow-hidden aspect-[4/5]">
+                <img src="https://placehold.co/800x1000/f0f0f0/333?text=Mono+Space" class="absolute inset-0 w-full h-full object-cover" alt="Project 2">
+                <div class="absolute bottom-0 left-0 w-full p-6 bg-white border-t-black translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <h4 class="text-xl font-bold uppercase">Mono Space</h4>
+                    <p class="font-mono text-xs text-gray-500 mt-1">Rebranding</p>
+                </div>
+            </a>
+
+            <!-- Project 3 -->
+            <a href="#" class="project-card group block relative overflow-hidden aspect-[4/5]">
+                <img src="https://placehold.co/800x1000/d4d4d4/333?text=North+Star" class="absolute inset-0 w-full h-full object-cover" alt="Project 3">
+                <div class="absolute bottom-0 left-0 w-full p-6 bg-white border-t-black translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <h4 class="text-xl font-bold uppercase">North Star</h4>
+                    <p class="font-mono text-xs text-gray-500 mt-1">Strategy & Logo</p>
+                </div>
+            </a>
+        </div>
         
-        const showRandomQuote = () => {
-            if (quotes.length <= 1) {
-                showQuote(0);
-                return;
-            }
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * quotes.length);
-            } while (newIndex === currentQuoteIndex); // Ensure the new quote is different from the current one
+        <!-- View All Button -->
+        <div class="py-16 text-center bg-[#F2F2F2]">
+            <a href="#" class="inline-block px-12 py-4 border border-black bg-white font-bold uppercase text-sm tracking-widest hover:bg-black hover:text-white hover:shadow-[8px_8px_0px_#FF3300] transition-all">
+                View Full Archive
+            </a>
+        </div>
+    </section>
 
-            currentQuoteIndex = newIndex;
-            showQuote(currentQuoteIndex);
-        };
+    <!-- Contact Area -->
+    <section id="contact" class="border-t-black bg-[#FF3300] text-white selection:bg-black selection:text-white">
+        <div class="container mx-auto px-6 py-24 md:py-32">
+            <div class="max-w-4xl">
+                <p class="font-mono text-sm md:text-base mb-6 opacity-80 uppercase tracking-widest">
+                    // Status: Available for new projects
+                </p>
+                <h2 class="display-text text-5xl md:text-7xl lg:text-8xl font-bold uppercase mb-12 leading-none">
+                    Let's build <br> something solid.
+                </h2>
+                
+                <div class="flex flex-col md:flex-row gap-6">
+                    <a href="mailto:logolabystudio@gmail.com" class="inline-block px-8 py-5 bg-black text-white border border-black font-bold uppercase text-lg hover:bg-white hover:text-black transition-colors">
+                        logolabystudio@gmail.com
+                    </a>
+                    <a href="tel:+918252445069" class="inline-block px-8 py-5 bg-transparent border border-white text-white font-bold uppercase text-lg hover:bg-white hover:text-[#FF3300] transition-colors">
+                        +91 8252445069
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // Initialize slider on page load with a random quote
-        document.addEventListener('DOMContentLoaded', () => {
-            showRandomQuote();
-        });
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12 border-t border-gray-800">
+        <div class="px-6 md:px-12 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <span class="font-bold text-xl tracking-tighter uppercase">Logo Laby Studio</span>
+                <p class="font-mono text-xs text-gray-500 mt-1">© 2025 Md Arshad Alam. All rights reserved.</p>
+            </div>
+            <div class="flex gap-8 font-mono text-sm uppercase">
+                <a href="#" class="hover:text-[#FF3300] transition-colors">Instagram</a>
+                <a href="#" class="hover:text-[#FF3300] transition-colors">LinkedIn</a>
+                <a href="#" class="hover:text-[#FF3300] transition-colors">Behance</a>
+            </div>
+        </div>
+    </footer>
 
-        prevBtn.addEventListener('click', showRandomQuote);
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/918252445069" target="_blank" class="whatsapp-btn w-14 h-14 flex items-center justify-center rounded-none">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.31 3.4 16.78L2 22L7.39 20.62C8.8 21.36 10.38 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 6.45 17.5 2 12.04 2ZM16.57 14.49C16.31 15.24 15.46 15.71 14.76 15.82C14.16 15.92 13.44 15.93 12.83 15.71C12.11 15.46 11.29 15.11 10.42 14.28C9.39 13.28 8.65 12.08 8.41 11.45C8.16 10.82 8.01 10.12 8.02 9.43C8.03 8.74 8.24 8.11 8.68 7.72C9 7.42 9.4 7.22 9.83 7.22C10.08 7.22 10.31 7.27 10.53 7.38C10.8 7.52 11 7.79 11.14 8.08C11.32 8.46 11.49 8.86 11.58 9.25C11.67 9.64 11.7 9.8 11.61 10.05C11.52 10.3 11.3 10.5 11.08 10.7C10.86 10.9 10.66 11.08 10.51 11.25C10.36 11.42 10.21 11.6 10.29 11.79C10.38 11.98 10.83 12.8 11.62 13.53C12.55 14.39 13.34 14.71 13.56 14.82C13.78 14.92 14.04 14.9 14.23 14.73C14.47 14.51 14.76 14.09 15.11 13.7C15.47 13.31 15.82 13.17 16.14 13.17C16.46 13.17 16.7 13.29 16.89 13.6C17.08 13.91 17.21 14.27 17.21 14.49H17.21L16.57 14.49Z"></path></svg>
+    </a>
 
-        nextBtn.addEventListener('click', showRandomQuote);
-    </script>
 </body>
 </html>
-
-
