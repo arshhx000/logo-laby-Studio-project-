@@ -1,0 +1,618 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Analyzer - Logo Laby Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #F2F2F2;
+            --ink-color: #111111;
+            --accent-color: #FF3300; /* Safety Orange */
+            --grid-line: #d4d4d4;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--ink-color);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .font-mono {
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* --- Grid System --- */
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+        .grid-line {
+            width: 1px;
+            height: 100%;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* --- Border Utilities --- */
+        .border-black { border-color: var(--ink-color); }
+        .border-t-black { border-top: 1px solid var(--ink-color); }
+        .border-b-black { border-bottom: 1px solid var(--ink-color); }
+        .border-l-black { border-left: 1px solid var(--ink-color); }
+        .border-r-black { border-right: 1px solid var(--ink-color); }
+        .border-dashed-black { border: 2px dashed var(--ink-color); }
+
+        /* --- Typography --- */
+        .display-text {
+            line-height: 0.9;
+            letter-spacing: -0.03em;
+        }
+        
+        /* --- Hover Image Reveal --- */
+        .project-card img {
+            filter: grayscale(100%);
+            transition: filter 0.4s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .project-card:hover img {
+            filter: grayscale(0%);
+            transform: scale(1.05);
+        }
+
+        /* --- Marquee --- */
+        .marquee-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 15s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- WhatsApp Float --- */
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 50;
+            background: var(--ink-color);
+            color: white;
+            border: 1px solid var(--ink-color);
+            transition: all 0.3s ease;
+            box-shadow: 5px 5px 0px var(--accent-color);
+        }
+        .whatsapp-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0px var(--accent-color);
+        }
+
+        /* --- Selection --- */
+        ::selection {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* --- Tool Specific Styles --- */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-color);
+            animation: scan 2s linear infinite;
+            display: none;
+            z-index: 10;
+        }
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Vertical Grid Background -->
+    <div class="grid-overlay hidden md:flex">
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 bg-[#F2F2F2] border-b-black">
+        <div class="flex justify-between items-stretch h-16">
+            <!-- Logo Area -->
+            <a href="#" onclick="window.location.reload()" class="flex items-center gap-3 px-6 md:px-10 text-xl font-bold uppercase tracking-tighter border-r-black bg-white hover:bg-[#FF3300] hover:text-white transition-colors group">
+                <img src="lls.png" alt="Logo" class="w-8 h-8 border border-current object-cover">
+                <span>Logo Laby<span class="hidden md:inline">&nbsp;Studio</span></span>
+            </a>
+            
+            <!-- Marquee in Nav -->
+            <div class="hidden md:flex flex-1 items-center overflow-hidden border-r-black bg-[#F2F2F2]">
+                <div class="marquee-wrap w-full">
+                    <div class="marquee-content font-mono text-xs uppercase tracking-widest">
+                        • Logo Audits • Structural Analysis • Geometry Repair • Vector Precision • Optical Corrections • Brand Diagnostics • Logo Audits • Structural Analysis • Geometry Repair • Vector Precision
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu Links -->
+            <div class="flex items-stretch">
+                <a href="#tool-container" class="flex items-center px-8 bg-[#FF3300] text-white text-sm font-bold uppercase hover:bg-black transition-colors">
+                    Analyze Free
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Tool Interface & Hero -->
+    <header id="tool-container" class="pt-24 pb-12 flex flex-col px-4 md:px-10">
+        
+        <!-- Hero Text -->
+        <div class="mb-12 max-w-5xl">
+            <span class="font-mono text-xs uppercase tracking-widest text-[#FF3300] block mb-4 font-bold">// Logo Laby Studio Tools</span>
+            <h1 class="display-text text-4xl md:text-6xl lg:text-7xl font-bold uppercase mb-6">
+                Logo Analyzer - Get Instant Professional Feedback
+            </h1>
+            <p class="font-mono text-sm md:text-base text-gray-600 max-w-2xl mb-8 leading-relaxed">
+                Analyze your logo's effectiveness with intelligent design evaluation. Discover strengths, weaknesses, and actionable improvements in seconds.
+            </p>
+            
+            <!-- Illustration Section -->
+            <div class="w-full mb-10">
+                <img src="logoanalyzer.png" 
+                     alt="Tool Illustration" 
+                     class="w-full h-auto border border-black shadow-[4px_4px_0px_#000] md:max-w-3xl">
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="document.getElementById('file-input').click()" class="px-8 py-4 bg-black text-white font-bold uppercase text-sm hover:bg-[#FF3300] transition-colors">
+                    Analyze Your Logo Free
+                </button>
+                <a href="#how-it-works" class="px-8 py-4 border border-black bg-transparent text-black font-bold uppercase text-sm hover:bg-black hover:text-white transition-colors">
+                    See How It Works
+                </a>
+            </div>
+        </div>
+
+        <!-- Tool UI -->
+        <div class="flex-1 grid lg:grid-cols-12 gap-0 border border-black bg-white shadow-[8px_8px_0px_#000]">
+            
+            <!-- Left: Visualizer / Input -->
+            <div class="lg:col-span-7 relative bg-[#e5e5e5] border-b lg:border-b-0 lg:border-r border-black min-h-[400px] flex flex-col">
+                <!-- Grid Background -->
+                <div class="absolute inset-0 grid-bg opacity-50 pointer-events-none"></div>
+                
+                <!-- Scan Line Effect -->
+                <div id="scan-line" class="scan-line"></div>
+
+                <!-- Upload Drop Zone -->
+                <div id="drop-zone" class="absolute inset-0 flex flex-col items-center justify-center p-8 transition-opacity duration-300">
+                    <div class="border-2 border-dashed border-gray-400 hover:border-[#FF3300] hover:bg-white/50 w-full h-full flex flex-col items-center justify-center cursor-pointer transition-all group" onclick="document.getElementById('file-input').click()">
+                        <svg class="w-16 h-16 text-gray-400 group-hover:text-[#FF3300] mb-4 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <p class="font-mono text-sm uppercase font-bold text-gray-600 group-hover:text-black">Drop Logo File Here</p>
+                        <p class="font-mono text-xs text-gray-400 mt-2">JPG, PNG, SVG (Max 5MB)</p>
+                    </div>
+                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileSelect(event)">
+                </div>
+
+                <!-- Image Preview Container (Hidden initially) -->
+                <div id="preview-container" class="hidden absolute inset-0 flex items-center justify-center p-8">
+                    <img id="uploaded-image" src="" alt="Uploaded Logo" class="max-w-full max-h-full object-contain drop-shadow-lg">
+                    <!-- Rulers -->
+                    <div class="absolute top-0 left-0 w-full h-6 bg-black/5 text-[10px] font-mono flex items-center px-2 text-gray-500 border-b border-gray-300">0px ---------------- 100%</div>
+                    <div class="absolute top-0 left-0 w-6 h-full bg-black/5 text-[10px] font-mono flex flex-col items-center py-2 text-gray-500 border-r border-gray-300"><span class="-rotate-90 whitespace-nowrap mt-4">0px</span></div>
+                </div>
+            </div>
+
+            <!-- Right: Data Output -->
+            <div class="lg:col-span-5 bg-[#111111] text-white p-6 md:p-8 font-mono text-sm flex flex-col">
+                <div class="border-b border-gray-800 pb-4 mb-4 flex justify-between items-center">
+                    <span class="uppercase tracking-widest text-gray-500">Analysis Log</span>
+                    <button onclick="resetTool()" class="text-[#FF3300] hover:text-white text-xs uppercase">[ Reset System ]</button>
+                </div>
+
+                <!-- Terminal Output -->
+                <div id="terminal-output" class="flex-1 overflow-y-auto min-h-[200px] font-mono text-xs md:text-sm space-y-2 text-gray-300 mb-6">
+                    <p>> Initializing analyzer...</p>
+                    <p>> System ready.</p>
+                    <p class="animate-pulse">> Waiting for object...</p>
+                </div>
+
+                <!-- Results Panel (Hidden initially) -->
+                <div id="results-panel" class="hidden border-t border-gray-800 pt-6 space-y-6">
+                    <!-- Metrics -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-900 p-3 border border-gray-700">
+                            <span class="block text-gray-500 text-[10px] uppercase">Dimensions</span>
+                            <span id="res-dims" class="text-lg font-bold text-white">0 x 0</span>
+                        </div>
+                        <div class="bg-gray-900 p-3 border border-gray-700">
+                            <span class="block text-gray-500 text-[10px] uppercase">Aspect Ratio</span>
+                            <span id="res-ratio" class="text-lg font-bold text-[#FF3300]">0:0</span>
+                        </div>
+                        <div class="bg-gray-900 p-3 border border-gray-700">
+                            <span class="block text-gray-500 text-[10px] uppercase">Format</span>
+                            <span id="res-format" class="text-lg font-bold text-white">PNG</span>
+                        </div>
+                        <div class="bg-gray-900 p-3 border border-gray-700">
+                            <span class="block text-gray-500 text-[10px] uppercase">Score</span>
+                            <span id="res-score" class="text-lg font-bold text-[#FF3300]">A+</span>
+                        </div>
+                    </div>
+
+                    <!-- Palette Extractor -->
+                    <div>
+                        <span class="block text-gray-500 text-[10px] uppercase mb-2">Detected Palette</span>
+                        <div id="color-palette" class="flex gap-2">
+                            <!-- Swatches injected here -->
+                        </div>
+                    </div>
+
+                    <button class="w-full py-3 bg-[#FF3300] text-white font-bold uppercase text-xs hover:bg-white hover:text-black transition-colors mt-4">
+                        Download Full PDF Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="border-t-black border-b-black bg-[#F9F9F9] py-16">
+        <div class="px-4 md:px-10">
+            <h2 class="text-sm font-mono uppercase tracking-widest mb-10 text-gray-500">Workflow</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="relative">
+                    <span class="text-6xl font-bold text-gray-200 absolute -top-8 -left-4 -z-10">01</span>
+                    <h3 class="text-xl font-bold uppercase mb-2">Upload Your Logo</h3>
+                    <p class="font-mono text-xs text-gray-600 leading-relaxed">Upload your design in PNG, JPG, or SVG format directly to our secure analyzer.</p>
+                </div>
+                <div class="relative">
+                    <span class="text-6xl font-bold text-gray-200 absolute -top-8 -left-4 -z-10">02</span>
+                    <h3 class="text-xl font-bold uppercase mb-2">Choose Analysis</h3>
+                    <p class="font-mono text-xs text-gray-600 leading-relaxed">Select between our instant AI-powered diagnostics or a comprehensive manual expert review.</p>
+                </div>
+                <div class="relative">
+                    <span class="text-6xl font-bold text-gray-200 absolute -top-8 -left-4 -z-10">03</span>
+                    <h3 class="text-xl font-bold uppercase mb-2">Get Insights</h3>
+                    <p class="font-mono text-xs text-gray-600 leading-relaxed">Receive a detailed report with actionable feedback, scores, and design recommendations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="border-b-black bg-white grid md:grid-cols-2">
+        <div class="p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black flex flex-col justify-center">
+            <h2 class="display-text text-4xl md:text-5xl font-bold uppercase mb-6">About Logo Laby Studio</h2>
+            <p class="font-mono text-sm leading-relaxed text-gray-600 mb-6">
+                Logo Laby Studio is led by <strong class="text-black">Arshad Alam</strong>—an experienced logo designer who has spent over 4 years helping businesses and entrepreneurs create meaningful, memorable brand identities.
+            </p>
+            <p class="font-mono text-sm leading-relaxed text-gray-600">
+                With hundreds of logos designed, we understand the impact of a strong logo. Our Logo Analyzer tool is here to help you maximize yours, with both instant AI-powered and expert manual reviews.
+            </p>
+        </div>
+        <div class="bg-[#111111] text-white p-8 md:p-16 flex flex-col justify-center">
+            <h3 class="text-2xl font-bold uppercase mb-4 text-[#FF3300]">Why Analysis Matters</h3>
+            <p class="font-mono text-sm leading-relaxed opacity-80 mb-8">
+                A professionally analyzed logo helps your business stand out, builds trust, and boosts customer engagement. Even small improvements can lead to greater brand recognition.
+            </p>
+            <div class="h-px w-full bg-gray-800 mb-8"></div>
+            <div class="grid grid-cols-2 gap-8">
+                <div>
+                    <span class="block text-3xl font-bold text-[#FF3300]">4+</span>
+                    <span class="text-xs font-mono uppercase text-gray-500">Years Exp.</span>
+                </div>
+                <div>
+                    <span class="block text-3xl font-bold text-[#FF3300]">100s</span>
+                    <span class="text-xs font-mono uppercase text-gray-500">Logos Crafted</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Features -->
+    <section id="features" class="border-b-black bg-[#F2F2F2]">
+        <div class="grid md:grid-cols-12">
+            <div class="md:col-span-3 p-8 md:p-12 border-b-black md:border-b-0 md:border-r-black bg-white">
+                <h2 class="text-sm font-mono uppercase tracking-widest mb-4 text-gray-500">Analysis Features</h2>
+                <p class="text-xl font-bold leading-tight">
+                    Comprehensive evaluation points.
+                </p>
+            </div>
+            <div class="md:col-span-9 grid md:grid-cols-2">
+                <div class="p-8 border-b-black md:border-b-0 md:border-r-black hover:bg-white transition-colors">
+                    <h3 class="font-bold uppercase mb-2 text-[#FF3300]">Design Fundamentals</h3>
+                    <p class="text-xs font-mono text-gray-600">Color harmony, typography, balance, and scalability checks.</p>
+                </div>
+                <div class="p-8 border-b-black md:border-b-0 hover:bg-white transition-colors">
+                    <h3 class="font-bold uppercase mb-2 text-[#FF3300]">Brand Impact</h3>
+                    <p class="text-xs font-mono text-gray-600">Memorability, industry fit, and uniqueness assessment.</p>
+                </div>
+                <div class="p-8 border-b-black md:border-b-0 md:border-r-black hover:bg-white transition-colors">
+                    <h3 class="font-bold uppercase mb-2 text-[#FF3300]">Technical Quality</h3>
+                    <p class="text-xs font-mono text-gray-600">Resolution integrity, versatility, and file optimization.</p>
+                </div>
+                <div class="p-8 hover:bg-white transition-colors">
+                    <h3 class="font-bold uppercase mb-2 text-[#FF3300]">Competitive Edge</h3>
+                    <p class="text-xs font-mono text-gray-600">How you stand out versus industry standards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="border-b-black bg-white py-16 px-4 md:px-10">
+        <div class="text-center mb-12">
+            <h2 class="display-text text-4xl font-bold uppercase">Select Your Plan</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <!-- Free -->
+            <div class="border border-black p-8 hover:shadow-[8px_8px_0px_#000] transition-shadow bg-[#F9F9F9]">
+                <h3 class="text-xl font-bold uppercase mb-2">Free</h3>
+                <p class="font-mono text-xs text-gray-500 mb-6">For quick checks</p>
+                <ul class="space-y-3 font-mono text-sm mb-8">
+                    <li class="flex items-center gap-2"><span class="text-[#FF3300]">✓</span> Basic design score</li>
+                    <li class="flex items-center gap-2"><span class="text-[#FF3300]">✓</span> 3 key insights</li>
+                    <li class="flex items-center gap-2"><span class="text-[#FF3300]">✓</span> Color palette analysis</li>
+                </ul>
+                <button onclick="document.getElementById('file-input').click()" class="w-full py-3 border border-black font-bold uppercase text-xs hover:bg-black hover:text-white transition-colors">Analyze Now</button>
+            </div>
+            <!-- Pro -->
+            <div class="border border-black p-8 shadow-[8px_8px_0px_#FF3300] bg-black text-white relative">
+                <div class="absolute top-0 right-0 bg-[#FF3300] text-white text-[10px] font-bold px-2 py-1 uppercase">Recommended</div>
+                <h3 class="text-xl font-bold uppercase mb-2">Pro</h3>
+                <p class="font-mono text-xs text-gray-400 mb-6">For detailed audits</p>
+                <ul class="space-y-3 font-mono text-sm mb-8">
+                    <li class="flex items-center gap-2"><span class="text-[#FF3300]">✓</span> Comprehensive 20-point eval</li>
+                    <li class="flex items-center gap-2"><span class="text-[#FF3300]">✓</span> Detailed suggestions</li>
+                    <li class="flex items-center gap-2"><span class="text-[#FF3300]">✓</span> Industry comparison</li>
+                    <li class="flex items-center gap-2"><span class="text-[#FF3300]">✓</span> PDF Report Download</li>
+                </ul>
+                <button class="w-full py-3 bg-[#FF3300] text-white font-bold uppercase text-xs hover:bg-white hover:text-black transition-colors">Get Pro Report</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="border-b-black bg-[#F9F9F9] py-16 px-4 md:px-10">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold uppercase mb-8 text-center">Freq. Asked Questions</h2>
+            <div class="space-y-4">
+                <div class="bg-white border border-black p-6">
+                    <h4 class="font-bold uppercase mb-2 text-sm">How accurate is the automatic analysis?</h4>
+                    <p class="font-mono text-xs text-gray-600">Our AI uses industry standards and design best practices to give reliable, fast feedback on technical and aesthetic parameters.</p>
+                </div>
+                <div class="bg-white border border-black p-6">
+                    <h4 class="font-bold uppercase mb-2 text-sm">Can I analyze multiple logo versions?</h4>
+                    <p class="font-mono text-xs text-gray-600">Yes! You can upload different versions sequentially to compare their scores and performance metrics.</p>
+                </div>
+                <div class="bg-white border border-black p-6">
+                    <h4 class="font-bold uppercase mb-2 text-sm">Do you store my logo designs?</h4>
+                    <p class="font-mono text-xs text-gray-600">Your privacy is important. Logos are processed for analysis and deleted within 24 hours unless you explicitly save them to a user account.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Footer -->
+    <footer id="contact" class="bg-black text-white py-16 border-t border-gray-800">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-start mb-12">
+                <div class="mb-8 md:mb-0 max-w-md">
+                    <span class="font-bold text-2xl tracking-tighter uppercase block mb-4">Logo Laby Studio</span>
+                    <p class="font-mono text-sm text-gray-400 leading-relaxed">
+                        Ready to improve your logo? Upload your design now and get instant professional feedback. Join hundreds of businesses creating stronger brand identities with Logo Laby Studio.
+                    </p>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <a href="mailto:logolabystudio@gmail.com" class="text-lg font-bold hover:text-[#FF3300] transition-colors">logolabystudio@gmail.com</a>
+                    <div class="flex gap-6 font-mono text-sm uppercase text-gray-500">
+                        <a href="#" class="hover:text-[#FF3300] transition-colors">Instagram</a>
+                        <a href="#" class="hover:text-[#FF3300] transition-colors">LinkedIn</a>
+                        <a href="#" class="hover:text-[#FF3300] transition-colors">Behance</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex justify-between items-center">
+                <p class="font-mono text-xs text-gray-600">© 2025 Logo Laby Studio. All rights reserved.</p>
+                <p class="font-mono text-xs text-gray-600">Designed by Arshad Alam</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const previewContainer = document.getElementById('preview-container');
+        const uploadedImage = document.getElementById('uploaded-image');
+        const terminalOutput = document.getElementById('terminal-output');
+        const scanLine = document.getElementById('scan-line');
+        const resultsPanel = document.getElementById('results-panel');
+        const statusIndicator = document.getElementById('status-indicator');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropZone.firstElementChild.classList.add('bg-white/50', 'border-[#FF3300]');
+        }
+        function unhighlight(e) {
+            dropZone.firstElementChild.classList.remove('bg-white/50', 'border-[#FF3300]');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if(files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    processImage(file);
+                } else {
+                    logToTerminal("Error: Invalid file type. Image required.", "text-red-500");
+                }
+            }
+        }
+
+        function logToTerminal(text, colorClass = "text-gray-300") {
+            const p = document.createElement('p');
+            p.textContent = `> ${text}`;
+            p.className = colorClass;
+            terminalOutput.appendChild(p);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        function processImage(file) {
+            // UI Updates
+            dropZone.classList.add('hidden');
+            previewContainer.classList.remove('hidden');
+            statusIndicator.textContent = "● PROCESSING...";
+            statusIndicator.classList.add('text-yellow-500');
+            statusIndicator.classList.remove('text-[#FF3300]');
+            
+            // Read File
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedImage.src = e.target.result;
+                
+                // Start Simulation Sequence
+                startAnalysisSequence(file);
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function startAnalysisSequence(file) {
+            const steps = [
+                { msg: `File loaded: ${file.name}`, delay: 500 },
+                { msg: "Analyzing geometric bounds...", delay: 1200 },
+                { msg: "Checking vector integrity...", delay: 2000 },
+                { msg: "Sampling color palette...", delay: 2800 },
+                { msg: "Calculating contrast ratios...", delay: 3500 },
+                { msg: "Analysis complete.", delay: 4000 }
+            ];
+
+            // Show scan line
+            scanLine.style.display = 'block';
+
+            let currentTime = 0;
+            steps.forEach(step => {
+                setTimeout(() => {
+                    logToTerminal(step.msg);
+                }, step.delay);
+            });
+
+            setTimeout(() => {
+                finalizeAnalysis(file);
+            }, 4200);
+        }
+
+        function finalizeAnalysis(file) {
+            scanLine.style.display = 'none';
+            resultsPanel.classList.remove('hidden');
+            statusIndicator.textContent = "● ANALYSIS COMPLETE";
+            statusIndicator.classList.remove('text-yellow-500');
+            statusIndicator.classList.add('text-green-500');
+
+            // Fake Real Data
+            const img = new Image();
+            img.src = uploadedImage.src;
+            
+            img.onload = () => {
+                // Dimensions
+                document.getElementById('res-dims').textContent = `${img.naturalWidth} x ${img.naturalHeight}px`;
+                
+                // Ratio
+                const gcd = (a, b) => b == 0 ? a : gcd(b, a % b);
+                const r = gcd(img.naturalWidth, img.naturalHeight);
+                const aspect = `${img.naturalWidth/r}:${img.naturalHeight/r}`;
+                document.getElementById('res-ratio').textContent = aspect.length > 8 ? parseFloat(img.naturalWidth/img.naturalHeight).toFixed(2) : aspect;
+
+                // Format
+                const ext = file.name.split('.').pop().toUpperCase();
+                document.getElementById('res-format').textContent = ext;
+
+                // Random Score
+                const scores = ['A+', 'A', 'B+', 'B', 'A-'];
+                document.getElementById('res-score').textContent = scores[Math.floor(Math.random() * scores.length)];
+
+                // Generate Random Palette (Simulation)
+                const paletteContainer = document.getElementById('color-palette');
+                paletteContainer.innerHTML = '';
+                for(let i=0; i<4; i++) {
+                    const color = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+                    const div = document.createElement('div');
+                    div.className = 'w-8 h-8 rounded-full border border-gray-600';
+                    div.style.backgroundColor = color;
+                    div.title = color;
+                    paletteContainer.appendChild(div);
+                }
+            };
+        }
+
+        function resetTool() {
+            dropZone.classList.remove('hidden');
+            previewContainer.classList.add('hidden');
+            resultsPanel.classList.add('hidden');
+            uploadedImage.src = "";
+            terminalOutput.innerHTML = '<p>> Initializing analyzer...</p><p>> System ready.</p><p class="animate-pulse">> Waiting for object...</p>';
+            statusIndicator.textContent = "● WAITING FOR INPUT";
+            statusIndicator.classList.remove('text-green-500');
+            statusIndicator.classList.add('text-[#FF3300]');
+            document.getElementById('file-input').value = "";
+        }
+    </script>
+</body>
+</html>
